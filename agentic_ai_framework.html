@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>AAAF-ITO — Agentic AI Adoption Framework for IT & Operations</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --color-text-primary: #1C1C1A;
+    --color-text-secondary: #5F5E5A;
+    --color-text-tertiary: #9B9991;
+    --color-background-primary: #FFFFFF;
+    --color-background-secondary: #F1EFE8;
+    --color-background-tertiary: #FAF8F2;
+    --color-border-primary: #B8B4AA;
+    --color-border-secondary: #CCC8BF;
+    --color-border-tertiary: #E5E2DB;
+    --border-radius-md: 6px;
+    --border-radius-lg: 10px;
+
+    /* Phases */
+    --phase-1: #5DCAA5;  --phase-1-bg: #E1F5EE;  --phase-1-fg: #0F6E56;
+    --phase-2: #AFA9EC;  --phase-2-bg: #EEEDFE;  --phase-2-fg: #3C3489;
+    --phase-3: #F0997B;  --phase-3-bg: #FAECE7;  --phase-3-fg: #712B13;
+    --phase-4: #378ADD;  --phase-4-bg: #E6F1FB;  --phase-4-fg: #0C447C;
+
+    /* HITL */
+    --hitl-1: #C44C3E;  --hitl-1-bg: #FCEBEB;  --hitl-1-fg: #791F1F;
+    --hitl-2: #E2A53E;  --hitl-2-bg: #FBF1DD;  --hitl-2-fg: #6B4A0E;
+    --hitl-3: #4FA37B;  --hitl-3-bg: #E1F5EE;  --hitl-3-fg: #0F6E56;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    background: transparent;
+    color: var(--color-text-primary);
+    padding: 0;
+  }
+
+  .fw-root { padding: 1.5rem 0; font-size: 14px; }
+  .fw-title { font-size: 22px; font-weight: 600; margin-bottom: 4px; letter-spacing: -0.01em; }
+  .fw-subtitle { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 1.5rem; }
+  .fw-badge-row { display: flex; gap: 6px; margin-bottom: 1rem; flex-wrap: wrap; }
+  .fw-badge { font-size: 10.5px; padding: 3px 9px; border-radius: 20px;
+              background: var(--color-background-secondary);
+              color: var(--color-text-secondary); border: 0.5px solid var(--color-border-tertiary); }
+
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem;
+          border-bottom: 0.5px solid var(--color-border-tertiary); padding-bottom: 10px; }
+  .tab { padding: 6px 14px; border-radius: var(--border-radius-md);
+         border: 0.5px solid var(--color-border-tertiary); cursor: pointer;
+         font-size: 13px; background: transparent; color: var(--color-text-secondary);
+         transition: all .15s; font-family: inherit; }
+  .tab:hover { background: var(--color-background-secondary); color: var(--color-text-primary); }
+  .tab.active { background: var(--color-background-secondary); color: var(--color-text-primary);
+                border-color: var(--color-border-primary); font-weight: 500; }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .sec-hd { font-size: 12px; text-transform: uppercase; letter-spacing: .06em;
+            color: var(--color-text-tertiary); font-weight: 500; margin-bottom: 10px; margin-top: 1.25rem; }
+  .sec-hd:first-child { margin-top: 0; }
+
+  .callout { border-left: 2px solid var(--color-border-secondary); padding: 10px 14px;
+             margin-bottom: 1.25rem; background: var(--color-background-tertiary);
+             border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; }
+  .callout p { font-size: 12.5px; color: var(--color-text-secondary); margin: 0; line-height: 1.6; }
+  .callout strong { color: var(--color-text-primary); font-weight: 500; }
+
+  /* Stats */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+           gap: 12px; margin-bottom: 1.5rem; }
+  .stat { border-radius: var(--border-radius-lg); padding: 16px;
+          background: var(--color-background-primary);
+          border: 0.5px solid var(--color-border-tertiary); }
+  .stat-num { font-size: 28px; font-weight: 600; color: var(--color-text-primary); line-height: 1; margin-bottom: 6px; }
+  .stat-label { font-size: 12px; color: var(--color-text-secondary); line-height: 1.4; }
+  .stat-src { font-size: 10.5px; color: var(--color-text-tertiary); margin-top: 6px; }
+
+  /* Phases */
+  .phases { display: flex; gap: 12px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .phase { flex: 1; min-width: 150px; border-radius: var(--border-radius-lg);
+           border: 0.5px solid var(--color-border-tertiary); padding: 14px 14px 12px;
+           background: var(--color-background-primary); }
+  .phase-num { font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 4px;
+               letter-spacing: .04em; text-transform: uppercase; }
+  .phase-name { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+  .phase-desc { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; }
+  .phase-badge { display: inline-block; font-size: 11px; padding: 2px 8px;
+                 border-radius: 20px; margin-bottom: 6px; }
+  .p-1 { border-top: 3px solid var(--phase-1); }
+  .p-1 .phase-name { color: var(--phase-1-fg); }
+  .p-1 .phase-badge { background: var(--phase-1-bg); color: var(--phase-1-fg); }
+  .p-2 { border-top: 3px solid var(--phase-2); }
+  .p-2 .phase-name { color: var(--phase-2-fg); }
+  .p-2 .phase-badge { background: var(--phase-2-bg); color: var(--phase-2-fg); }
+  .p-3 { border-top: 3px solid var(--phase-3); }
+  .p-3 .phase-name { color: var(--phase-3-fg); }
+  .p-3 .phase-badge { background: var(--phase-3-bg); color: var(--phase-3-fg); }
+  .p-4 { border-top: 3px solid var(--phase-4); }
+  .p-4 .phase-name { color: var(--phase-4-fg); }
+  .p-4 .phase-badge { background: var(--phase-4-bg); color: var(--phase-4-fg); }
+
+  /* Pillars */
+  .pillars { display: grid; grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+             gap: 10px; margin-bottom: 1.25rem; }
+  .pillar  { border-radius: var(--border-radius-lg);
+             border: 0.5px solid var(--color-border-tertiary); padding: 14px;
+             background: var(--color-background-primary); cursor: pointer; transition: all .15s;
+             position: relative; }
+  .pillar:hover   { border-color: var(--color-border-primary); transform: translateY(-1px); }
+  .pillar.selected{ border-color: var(--color-border-primary); background: var(--color-background-secondary); }
+  .pillar-icon { font-size: 20px; margin-bottom: 8px; }
+  .pillar-name { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+  .pillar-hint { font-size: 11px; color: var(--color-text-tertiary); line-height: 1.4; }
+  .pillar-star { position: absolute; top: 10px; right: 12px; font-size: 11px;
+                 color: var(--phase-3-fg); background: var(--phase-3-bg);
+                 padding: 1px 6px; border-radius: 10px; }
+  .pillar-diff { position: absolute; top: 10px; right: 12px; font-size: 11px;
+                 color: var(--phase-2-fg); background: var(--phase-2-bg);
+                 padding: 1px 6px; border-radius: 10px; }
+
+  .pillar-detail { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg);
+                   padding: 18px; margin-bottom: 1.25rem; background: var(--color-background-secondary); }
+  .pd-title { font-size: 16px; font-weight: 500; margin-bottom: 4px; }
+  .pd-meta  { font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 10px;
+              text-transform: uppercase; letter-spacing: .04em; }
+  .pd-desc  { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 14px; line-height: 1.6; }
+  .pd-grid  { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+  .pd-item  { background: var(--color-background-primary); border-radius: var(--border-radius-md);
+              border: 0.5px solid var(--color-border-tertiary); padding: 12px; }
+  .pd-item-label { font-size: 11px; text-transform: uppercase; letter-spacing: .05em;
+                   color: var(--color-text-tertiary); margin-bottom: 6px; font-weight: 500; }
+  .pd-item-text  { font-size: 12px; color: var(--color-text-secondary); line-height: 1.55; }
+  .pd-item-text ul { padding-left: 16px; margin: 0; }
+  .pd-item-text li { margin-bottom: 4px; }
+
+  /* Double posture */
+  .posture { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.25rem; }
+  @media (max-width: 720px) { .posture { grid-template-columns: 1fr; } }
+  .posture-card { background: var(--color-background-primary);
+                  border-radius: var(--border-radius-lg);
+                  border: 0.5px solid var(--color-border-tertiary); padding: 16px; }
+  .posture-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; text-transform: uppercase;
+                   letter-spacing: .04em; }
+  .posture-sub { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 10px; }
+  .posture-list { font-size: 12.5px; color: var(--color-text-secondary); line-height: 1.6;
+                  padding-left: 16px; }
+  .posture-list li { margin-bottom: 4px; }
+  .posture-consum { border-top: 3px solid var(--phase-4); }
+  .posture-consum .posture-title { color: var(--phase-4-fg); }
+  .posture-platform { border-top: 3px solid var(--phase-1); }
+  .posture-platform .posture-title { color: var(--phase-1-fg); }
+
+  /* Maturity */
+  .maturity-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.25rem; }
+  .mlevel { flex: 1; min-width: 110px; border-radius: var(--border-radius-md);
+            border: 0.5px solid var(--color-border-tertiary); padding: 12px 10px;
+            background: var(--color-background-primary); cursor: pointer; transition: all .15s; }
+  .mlevel:hover { border-color: var(--color-border-primary); }
+  .mlevel.sel   { background: var(--color-background-secondary); border-color: var(--color-border-primary); }
+  .ml-num  { font-size: 22px; font-weight: 500; margin-bottom: 2px; }
+  .ml-name { font-size: 12.5px; font-weight: 500; margin-bottom: 4px; }
+  .ml-hint { font-size: 11px; color: var(--color-text-tertiary); line-height: 1.4; }
+  .l1 .ml-num { color: #888780; }
+  .l2 .ml-num { color: #534AB7; }
+  .l3 .ml-num { color: #0F6E56; }
+  .l4 .ml-num { color: #185FA5; }
+  .l5 .ml-num { color: #993C1D; }
+
+  /* Maturity matrix */
+  .mat-matrix { overflow-x: auto; margin-bottom: 1.25rem; border-radius: var(--border-radius-lg);
+                border: 0.5px solid var(--color-border-tertiary); background: var(--color-background-primary); }
+  .mat-matrix table { width: 100%; border-collapse: collapse; font-size: 11.5px; min-width: 700px; }
+  .mat-matrix th, .mat-matrix td { padding: 9px 10px; text-align: left;
+                                    border-bottom: 0.5px solid var(--color-border-tertiary);
+                                    border-right: 0.5px solid var(--color-border-tertiary);
+                                    vertical-align: top; }
+  .mat-matrix th { background: var(--color-background-secondary); font-weight: 500;
+                   color: var(--color-text-primary); font-size: 11px; }
+  .mat-matrix th:first-child, .mat-matrix td:first-child { font-weight: 500; color: var(--color-text-primary); }
+  .mat-matrix tr:last-child td { border-bottom: none; }
+  .mat-matrix td:last-child, .mat-matrix th:last-child { border-right: none; }
+  .mat-matrix td { color: var(--color-text-secondary); line-height: 1.5; }
+
+  /* Maturity detail expanded */
+  .maturity-detail { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg);
+                     padding: 16px; background: var(--color-background-secondary); margin-bottom: 1.25rem; }
+  .mat-desc { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; margin-bottom: 12px; }
+  .mat-signals { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; margin-bottom: 12px; }
+  .mat-sig { background: var(--color-background-primary); border-radius: var(--border-radius-md);
+             border: 0.5px solid var(--color-border-tertiary); padding: 10px 12px; font-size: 11.5px;
+             color: var(--color-text-secondary); line-height: 1.5; }
+  .mat-frein { font-size: 12px; color: var(--color-text-secondary); padding: 10px 12px;
+               border-left: 2px solid var(--phase-3); background: var(--color-background-tertiary);
+               border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; }
+  .mat-frein strong { color: var(--phase-3-fg); font-weight: 500; }
+
+  /* Gov cards */
+  .gov-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+               gap: 10px; margin-bottom: 1.25rem; }
+  .gov-card  { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg);
+               padding: 14px; background: var(--color-background-primary); }
+  .gov-card-title { font-size: 13px; font-weight: 500; margin-bottom: 6px;
+                    display: flex; align-items: center; gap: 6px; }
+  .gov-card-body  { font-size: 12px; color: var(--color-text-secondary); line-height: 1.6; }
+  .gov-card-body strong { color: var(--color-text-primary); font-weight: 500; }
+  .gov-pill { font-size: 11px; padding: 2px 7px; border-radius: 20px; }
+  .gp-risk  { background: #FCEBEB; color: #791F1F; }
+  .gp-comp  { background: #E1F5EE; color: #085041; }
+  .gp-hr    { background: #EEEDFE; color: #3C3489; }
+  .gp-data  { background: #E6F1FB; color: #0C447C; }
+  .gp-orig  { background: #FBF1DD; color: #6B4A0E; }
+
+  /* HITL */
+  .hitl-levels { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                 gap: 10px; margin-bottom: 1.25rem; }
+  .hitl-card { border-radius: var(--border-radius-lg); padding: 14px;
+               background: var(--color-background-primary);
+               border: 0.5px solid var(--color-border-tertiary); }
+  .hitl-card.h1 { border-top: 3px solid var(--hitl-1); }
+  .hitl-card.h2 { border-top: 3px solid var(--hitl-2); }
+  .hitl-card.h3 { border-top: 3px solid var(--hitl-3); }
+  .hitl-tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 20px;
+              margin-bottom: 6px; font-weight: 500; }
+  .h1 .hitl-tag { background: var(--hitl-1-bg); color: var(--hitl-1-fg); }
+  .h2 .hitl-tag { background: var(--hitl-2-bg); color: var(--hitl-2-fg); }
+  .h3 .hitl-tag { background: var(--hitl-3-bg); color: var(--hitl-3-fg); }
+  .hitl-name { font-size: 13px; font-weight: 500; margin-bottom: 6px; }
+  .hitl-body { font-size: 12px; color: var(--color-text-secondary); line-height: 1.6; }
+
+  /* HITL matrix */
+  .hitl-matrix { overflow-x: auto; margin-bottom: 1.25rem; border-radius: var(--border-radius-lg);
+                 border: 0.5px solid var(--color-border-tertiary); background: var(--color-background-primary); }
+  .hitl-matrix table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 600px; }
+  .hitl-matrix th, .hitl-matrix td { padding: 8px 10px; text-align: center;
+                                      border-bottom: 0.5px solid var(--color-border-tertiary);
+                                      border-right: 0.5px solid var(--color-border-tertiary); }
+  .hitl-matrix th { background: var(--color-background-secondary); font-weight: 500;
+                    color: var(--color-text-primary); font-size: 11px;
+                    text-transform: uppercase; letter-spacing: .03em; }
+  .hitl-matrix td:first-child, .hitl-matrix th:first-child { text-align: left; font-weight: 500;
+                                                             color: var(--color-text-primary); }
+  .hitl-matrix td:last-child { text-align: left; font-size: 11px;
+                               color: var(--color-text-tertiary); font-style: italic; }
+  .hitl-matrix tr:last-child td { border-bottom: none; }
+  .hitl-cell { display: inline-block; width: 30px; padding: 3px 0; border-radius: 4px;
+               font-size: 11px; font-weight: 600; }
+  .hitl-cell.h1 { background: var(--hitl-1-bg); color: var(--hitl-1-fg); }
+  .hitl-cell.h2 { background: var(--hitl-2-bg); color: var(--hitl-2-fg); }
+  .hitl-cell.h3 { background: var(--hitl-3-bg); color: var(--hitl-3-fg); }
+
+  /* Roadmap */
+  .roadmap { display: flex; flex-direction: column; gap: 10px; margin-bottom: 1.25rem; }
+  .rm-row   { display: flex; align-items: stretch; gap: 10px; }
+  .rm-phase-label { width: 110px; min-width: 110px; font-size: 11px; font-weight: 500;
+                    color: var(--color-text-secondary); display: flex; flex-direction: column;
+                    align-items: flex-end; justify-content: center;
+                    padding-right: 10px; text-align: right; line-height: 1.4; }
+  .rm-phase-label .rm-phase-name { font-size: 12px; color: var(--color-text-primary); font-weight: 500; }
+  .rm-phase-label .rm-phase-time { font-size: 10.5px; color: var(--color-text-tertiary); margin-top: 2px; }
+  .rm-cards { display: flex; gap: 8px; flex: 1; flex-wrap: wrap; }
+  .rm-card  { flex: 1; min-width: 130px; border-radius: var(--border-radius-md);
+              border: 0.5px solid var(--color-border-tertiary); padding: 10px 12px;
+              background: var(--color-background-primary); }
+  .rm-card-title { font-size: 12px; font-weight: 500; margin-bottom: 3px; }
+  .rm-card-sub   { font-size: 11px; color: var(--color-text-tertiary); line-height: 1.45; }
+
+  /* Cas d'usage */
+  .uc-volets { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.25rem; }
+  @media (max-width: 720px) { .uc-volets { grid-template-columns: 1fr; } }
+  .uc-volet { border-radius: var(--border-radius-lg);
+              border: 0.5px solid var(--color-border-tertiary); padding: 14px;
+              background: var(--color-background-primary); }
+  .uc-volet-title { font-size: 12px; text-transform: uppercase; letter-spacing: .05em;
+                    color: var(--color-text-tertiary); margin-bottom: 10px; font-weight: 500; }
+  .uc-family { padding: 10px 0; border-top: 0.5px solid var(--color-border-tertiary); }
+  .uc-family:first-of-type { border-top: none; padding-top: 0; }
+  .uc-family-name { font-size: 13px; font-weight: 500; margin-bottom: 5px; }
+  .uc-family-items { font-size: 11.5px; color: var(--color-text-secondary); line-height: 1.55;
+                     padding-left: 16px; }
+  .uc-family-items li { margin-bottom: 2px; }
+
+  /* Architecture models */
+  .arch-models { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+                 gap: 10px; margin-bottom: 1.25rem; }
+  .arch-card { border-radius: var(--border-radius-lg);
+               border: 0.5px solid var(--color-border-tertiary); padding: 14px;
+               background: var(--color-background-primary); }
+  .arch-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .arch-sub { font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 8px; }
+  .arch-when { font-size: 11.5px; color: var(--color-text-secondary); padding: 6px 8px;
+               background: var(--color-background-tertiary); border-radius: var(--border-radius-md);
+               margin-bottom: 8px; line-height: 1.4; }
+  .arch-when strong { color: var(--color-text-primary); font-weight: 500; }
+  .arch-lists { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .arch-list { font-size: 11px; color: var(--color-text-secondary); line-height: 1.5;
+               padding-left: 14px; margin: 0; }
+  .arch-list-title { font-size: 10.5px; font-weight: 500; text-transform: uppercase;
+                     letter-spacing: .04em; margin-bottom: 3px; }
+  .arch-list-title.adv { color: var(--hitl-3-fg); }
+  .arch-list-title.lim { color: var(--hitl-1-fg); }
+  .arch-1 { border-top: 3px solid var(--phase-4); }
+  .arch-2 { border-top: 3px solid var(--phase-2); }
+  .arch-3 { border-top: 3px solid var(--phase-3); }
+
+  /* Axes orga */
+  .axes { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+          gap: 8px; margin-bottom: 1.25rem; }
+  .axe { border-radius: var(--border-radius-md);
+         border: 0.5px solid var(--color-border-tertiary); padding: 10px 12px;
+         background: var(--color-background-primary); display: flex; gap: 10px; align-items: center; }
+  .axe-num { font-size: 18px; font-weight: 600; color: var(--color-text-tertiary); min-width: 18px; }
+  .axe-content { flex: 1; }
+  .axe-title { font-size: 12px; font-weight: 500; margin-bottom: 1px; }
+  .axe-sub { font-size: 11px; color: var(--color-text-tertiary); line-height: 1.4; }
+
+  /* Plateforme P8 capabilities */
+  .p8-caps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+             gap: 10px; margin-bottom: 1.25rem; }
+  .p8-cap { border-radius: var(--border-radius-lg);
+            border: 0.5px solid var(--color-border-tertiary); padding: 14px;
+            background: var(--color-background-primary); border-left: 3px solid var(--phase-2); }
+  .p8-cap-title { font-size: 13px; font-weight: 500; margin-bottom: 6px;
+                  color: var(--phase-2-fg); display: flex; align-items: center; gap: 6px; }
+  .p8-cap-body { font-size: 11.5px; color: var(--color-text-secondary); line-height: 1.55;
+                 padding-left: 16px; }
+  .p8-cap-body li { margin-bottom: 3px; }
+
+  /* Sources */
+  .src-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+              gap: 10px; margin-bottom: 1.25rem; }
+  .src-card { border-radius: var(--border-radius-md);
+              border: 0.5px solid var(--color-border-tertiary); padding: 12px;
+              background: var(--color-background-primary); }
+  .src-tag { display: inline-block; font-size: 10.5px; padding: 1px 7px;
+             border-radius: 20px; margin-bottom: 6px; font-weight: 500; }
+  .src-tag.s-ext { background: var(--color-background-secondary); color: var(--color-text-secondary); }
+  .src-tag.s-orig { background: var(--phase-3-bg); color: var(--phase-3-fg); }
+  .src-title { font-size: 12.5px; font-weight: 500; margin-bottom: 4px; line-height: 1.4; }
+  .src-ref { font-size: 11px; color: var(--color-text-tertiary); line-height: 1.5; }
+  .src-ref a { color: var(--phase-4-fg); text-decoration: none; }
+  .src-ref a:hover { text-decoration: underline; }
+
+  /* Security layers */
+  .sec-layers { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 8px; margin-bottom: 1.25rem; }
+  .sec-layer { border-radius: var(--border-radius-md);
+               border: 0.5px solid var(--color-border-tertiary); padding: 12px;
+               background: var(--color-background-primary); border-left: 3px solid var(--hitl-1); }
+  .sec-layer-name { font-size: 12px; font-weight: 500; margin-bottom: 4px; }
+  .sec-layer-body { font-size: 11.5px; color: var(--color-text-secondary); line-height: 1.5; }
+
+  /* Footer */
+  .fw-foot { font-size: 11px; color: var(--color-text-tertiary); margin-top: 2rem;
+             padding-top: 12px; border-top: 0.5px solid var(--color-border-tertiary);
+             line-height: 1.5; }
+
+  /* Interactions piliers */
+  .inter-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md);
+                padding: 10px 12px; background: var(--color-background-primary); margin-bottom: 6px; }
+  .inter-flow { font-size: 11px; font-weight: 600; color: var(--phase-2-fg); margin-bottom: 4px; }
+  .inter-body { font-size: 11.5px; color: var(--color-text-secondary); line-height: 1.5; }
+  .inter-risk { font-size: 11px; color: var(--hitl-1-fg); font-style: italic; margin-top: 3px; }
+</style>
+</head>
+<body>
+
+<div class="fw-root">
+  <p class="fw-title">AAAF-ITO — Agentic AI Adoption Framework</p>
+  <p class="fw-subtitle">Cadre d'adoption de l'IA agentique pour la Direction IT &amp; Opérations — Secteur financier régulé</p>
+  <div class="fw-badge-row">
+    <span class="fw-badge">v1.2 · Mai 2026</span>
+    <span class="fw-badge">8 piliers</span>
+    <span class="fw-badge">5 niveaux de maturité</span>
+    <span class="fw-badge">HITL gradué</span>
+    <span class="fw-badge">Vendor-neutral</span>
+    <span class="fw-badge">Inspiré de l'AWS CAF</span>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showPanel('vision',this)">Vue d'ensemble</button>
+    <button class="tab" onclick="showPanel('pillars',this)">8 Piliers</button>
+    <button class="tab" onclick="showPanel('maturity',this)">Maturité</button>
+    <button class="tab" onclick="showPanel('governance',this)">Gouvernance &amp; HITL</button>
+    <button class="tab" onclick="showPanel('platform',this)">Plateforme &amp; Architecture</button>
+    <button class="tab" onclick="showPanel('usecases',this)">Cas d'usage &amp; Roadmap</button>
+    <button class="tab" onclick="showPanel('sources',this)">Sources &amp; Genèse</button>
+  </div>
+
+  <!-- ============================ VUE D'ENSEMBLE ============================ -->
+  <div class="panel active" id="panel-vision">
+    <p class="sec-hd">Pourquoi ce framework</p>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num">74%</div>
+        <div class="stat-label">des entreprises planifient des déploiements d'IA agentique</div>
+        <div class="stat-src">Deloitte, State of AI in the Enterprise 2026</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">21%</div>
+        <div class="stat-label">seulement disposent d'un modèle de gouvernance mature</div>
+        <div class="stat-src">Deloitte, State of AI in the Enterprise 2026</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">40%</div>
+        <div class="stat-label">des projets d'IA agentique seront abandonnés d'ici 2027</div>
+        <div class="stat-src">Gartner, juin 2025</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <p><strong>Le manque à combler :</strong> aucun équivalent universel et <em>vendor-neutral</em> du AWS Cloud Adoption Framework pour l'IA agentique ; les frameworks existants ne couvrent pas la dynamique Groupe / Entité Opérationnelle ; les contraintes du secteur financier (DORA, BCBS 239, MiCA, RGPD) nécessitent un pilier dédié ; le <strong>HITL gradué</strong> est absent de tous les frameworks publiés à ce jour.</p>
+    </div>
+
+    <p class="sec-hd">Structure — 4 phases × 8 piliers</p>
+    <div class="phases">
+      <div class="phase p-1">
+        <div class="phase-num">Phase 1</div>
+        <div class="phase-badge">3 – 9 mois</div>
+        <div class="phase-name">Explorer</div>
+        <div class="phase-desc">Auto-diagnostic maturité, désignation Chief AI Officer ITO, inventaire cas d'usage, constitution du Comité IA, alignement Groupe.</div>
+      </div>
+      <div class="phase p-2">
+        <div class="phase-num">Phase 2</div>
+        <div class="phase-badge">6 – 12 mois</div>
+        <div class="phase-name">Expérimenter</div>
+        <div class="phase-desc">Copilotes IDE, pilotes HITL-2/HITL-3 (Service Desk, AIOps), briques de base de la plateforme, premiers Passeports Agents.</div>
+      </div>
+      <div class="phase p-3">
+        <div class="phase-num">Phase 3</div>
+        <div class="phase-badge">9 – 18 mois</div>
+        <div class="phase-name">Industrialiser</div>
+        <div class="phase-desc">Plateforme agentique opérationnelle, premier agent métier hébergé, SOC semi-automatisé, dashboard AgentOps DORA, ROI documenté.</div>
+      </div>
+      <div class="phase p-4">
+        <div class="phase-num">Phase 4</div>
+        <div class="phase-badge">12 – 24 mois</div>
+        <div class="phase-name">Transformer</div>
+        <div class="phase-desc">ITO fournisseur de plateforme pour l'EO, agents Ops/Sécurité/ITIL industrialisés, contribution au Groupe, modèle de refacturation.</div>
+      </div>
+    </div>
+
+    <p class="sec-hd">Ce qui rend l'ITO unique — la double posture</p>
+    <div class="posture">
+      <div class="posture-card posture-consum">
+        <div class="posture-title">Consommatrice d'IA</div>
+        <div class="posture-sub">Pour ses propres processus IT &amp; Banking Operations</div>
+        <ul class="posture-list">
+          <li><strong>IT :</strong> AIOps, Service Desk L1/L2, copilotes développeurs (code, tests, CI/CD)</li>
+          <li><strong>Banking Operations :</strong> contrôle des dossiers de crédit, paiements/STP, contrôle documentaire Trade Finance</li>
+          <li>Périmètre Banking Operations = back-office métier (Credit, Cash Management, Trade Finance), distinct du volet IT Run</li>
+        </ul>
+      </div>
+      <div class="posture-card posture-platform">
+        <div class="posture-title">Plateforme pour les métiers</div>
+        <div class="posture-sub">L'ITO héberge et gouverne les agents de toute l'EO</div>
+        <ul class="posture-list">
+          <li>Héberge et opère les agents des autres directions de l'EO</li>
+          <li>Fournit APIs, LLMs et infrastructures approuvés (catalogue gouverné)</li>
+          <li>Impose les standards de sécurité et de gouvernance, joue le rôle de <strong>Gatekeeper IT</strong></li>
+          <li>Garantit traçabilité et auditabilité (DORA)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout">
+      <p>Cette double posture est <strong>absente de tous les frameworks IA publiés</strong> à ce jour. Elle fonde la spécificité de l'AAAF-ITO et justifie l'ajout du pilier P8 (Plateforme Agentique Interne) et le recalibrage du pilier P4 (Sécurité by Design, vue gardien).</p>
+    </div>
+
+    <p class="sec-hd">Spécificités du secteur financier</p>
+    <div class="gov-cards">
+      <div class="gov-card">
+        <div class="gov-card-title">⚖️ Cadre réglementaire</div>
+        <div class="gov-card-body"><strong>DORA</strong> (résilience opérationnelle), <strong>EU AI Act</strong> (systèmes à haut risque), <strong>BCBS 239</strong> (data risk), <strong>MiCA</strong>, <strong>RGPD</strong> art. 22 (décisions automatisées), recommandations <strong>ACPR</strong> et <strong>EBA</strong> sur l'IA.</div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">🏦 Dynamique Groupe / EO</div>
+        <div class="gov-card-body">L'EO navigue entre autonomie opérationnelle et standards Groupe. L'ITO est l'interlocuteur naturel de la DSI Groupe pour l'infrastructure agentique et le rôle de <strong>Gatekeeper</strong> sur les agents inter-directions.</div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">👥 Responsabilité humaine</div>
+        <div class="gov-card-body">La responsabilité légale et morale reste humaine. Le framework intègre un <strong>HITL gradué à 3 niveaux</strong>, recalibré par environnement de déploiement (Dev / Recette / Pré-prod / Prod).</div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">📊 Souveraineté des données</div>
+        <div class="gov-card-body">Routage local / cloud selon la sensibilité, inférence souveraine pour les données Banking Operations, cloisonnement clients / marché / interne, audit trail régulateur.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================ 8 PILIERS ============================ -->
+  <div class="panel" id="panel-pillars">
+    <p class="sec-hd">Cliquez sur un pilier pour le détail (objectif, activités clés, livrables)</p>
+    <div class="pillars" id="pillars-grid"></div>
+    <div class="pillar-detail" id="pillar-detail" style="display:none"></div>
+
+    <p class="sec-hd">Interactions critiques entre piliers</p>
+    <div class="inter-card">
+      <div class="inter-flow">P1 → P3 — La stratégie informe la gouvernance</div>
+      <div class="inter-body">Les cas d'usage priorisés en P1 déterminent les niveaux HITL et les Passeports Agents à émettre en P3.</div>
+      <div class="inter-risk">Risque si non géré : des agents déployés sans alignement stratégique créent une dette de gouvernance irrésorbable.</div>
+    </div>
+    <div class="inter-card">
+      <div class="inter-flow">P2 → P8 — L'infrastructure est le substrat de la plateforme</div>
+      <div class="inter-body">Sans données de qualité et sans architecture solide, la plateforme agentique ne peut pas fonctionner.</div>
+      <div class="inter-risk">Risque si non géré : la plateforme tombe en désuétude faute de données exploitables par les agents.</div>
+    </div>
+    <div class="inter-card">
+      <div class="inter-flow">P4 ⇄ P8 — Sécurité et plateforme co-dépendantes</div>
+      <div class="inter-body">Les contrôles IAM, le red teaming et la journalisation sont des composants intégrés de la plateforme.</div>
+      <div class="inter-risk">Risque si non géré : une plateforme sans sécurité by design est une vulnérabilité systémique pour toute l'EO.</div>
+    </div>
+    <div class="inter-card">
+      <div class="inter-flow">P6 → P5 — La culture conditionne les modèles opérationnels</div>
+      <div class="inter-body">Sans adoption réelle par les équipes ITO, les nouveaux rôles AgentOps restent théoriques.</div>
+      <div class="inter-risk">Risque si non géré : les processus AgentOps existent sur le papier mais ne sont pas appliqués en situation réelle.</div>
+    </div>
+    <div class="inter-card">
+      <div class="inter-flow">P7 → P1 + P8 — L'intégration Groupe contraint la stratégie et la plateforme</div>
+      <div class="inter-body">LLMs approuvés, architectures et politiques Groupe ne sont pas négociables.</div>
+      <div class="inter-risk">Risque si non géré : l'ITO construit une plateforme incompatible avec le Groupe, condamnée à être reconstruite.</div>
+    </div>
+  </div>
+
+  <!-- ============================ MATURITÉ ============================ -->
+  <div class="panel" id="panel-maturity">
+    <p class="sec-hd">Modèle de maturité — 5 niveaux</p>
+    <div class="maturity-grid">
+      <div class="mlevel l1" onclick="selectLevel(0)" id="ml-0">
+        <div class="ml-num">N1</div>
+        <div class="ml-name">Conscient</div>
+        <div class="ml-hint">Perception sans action</div>
+      </div>
+      <div class="mlevel l2" onclick="selectLevel(1)" id="ml-1">
+        <div class="ml-num">N2</div>
+        <div class="ml-name">Expérimentateur</div>
+        <div class="ml-hint">Actions structurées</div>
+      </div>
+      <div class="mlevel l3" onclick="selectLevel(2)" id="ml-2">
+        <div class="ml-num">N3</div>
+        <div class="ml-name">Opérationnel</div>
+        <div class="ml-hint">En production gouverné</div>
+      </div>
+      <div class="mlevel l4" onclick="selectLevel(3)" id="ml-3">
+        <div class="ml-num">N4</div>
+        <div class="ml-name">Industriel</div>
+        <div class="ml-hint">Mutualisé, ROI mesuré</div>
+      </div>
+      <div class="mlevel l5" onclick="selectLevel(4)" id="ml-4">
+        <div class="ml-num">N5</div>
+        <div class="ml-name">Transformateur</div>
+        <div class="ml-hint">Référence Groupe</div>
+      </div>
+    </div>
+    <div class="maturity-detail" id="maturity-detail">
+      <p style="font-size:13px;color:var(--color-text-tertiary)">Sélectionnez un niveau pour afficher les signaux observables, les freins et l'aperçu par pilier.</p>
+    </div>
+
+    <div class="callout">
+      <p><strong>Règle clé :</strong> le positionnement retenu est le niveau dont <strong>tous</strong> les signaux observables sont présents. Si l'un manque, le niveau inférieur est retenu. Le niveau le plus bas sur l'ensemble des piliers est le <strong>goulot d'étranglement</strong> de la transformation.</p>
+    </div>
+
+    <p class="sec-hd">Grille condensée — 8 piliers × 5 niveaux</p>
+    <div class="mat-matrix">
+      <table>
+        <thead>
+          <tr>
+            <th>Pilier</th>
+            <th>N1 Conscient</th>
+            <th>N2 Expérimentateur</th>
+            <th>N3 Opérationnel</th>
+            <th>N4 Industriel</th>
+            <th>N5 Transformateur</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>P1 Stratégie</td><td>Pas de vision IA ITO</td><td>1–2 cas d'usage identifiés</td><td>Portfolio géré, ROI mesuré</td><td>Plateforme ITO rentable</td><td>ITO = acteur stratégique Groupe</td></tr>
+          <tr><td>P2 Données</td><td>Données non cataloguées</td><td>Catalogue partiel</td><td>Pipelines fiables, data quality</td><td>Data lineage complet</td><td>Infrastructure anticipée N+1</td></tr>
+          <tr><td>P3 Gouvernance</td><td>Pas de processus agents</td><td>Passeport agent sur pilotes</td><td>Registre complet, HITL appliqué</td><td>Gouvernance Groupe intégrée</td><td>Gouvernance auto-améliorante</td></tr>
+          <tr><td>P4 Sécurité ≠</td><td>Pas de politique agents</td><td>IAM basique, red team ad hoc</td><td>Politique formelle, red team systématique</td><td>DORA couvert, audit réussi</td><td>Sécurité prédictive, threat intel</td></tr>
+          <tr><td>P5 Modèles Ops</td><td>ITIL classique, pas d'AgentOps</td><td>Monitoring manuel pilotes</td><td>AgentOps basique en prod</td><td>AgentOps mature, SLAs tenus</td><td>Ops quasi-autonomes</td></tr>
+          <tr><td>P6 Talent</td><td>Résistance ou indifférence</td><td>Ambassadeurs IA identifiés</td><td>Formation déployée, adoption</td><td>Équipes autonomes, rôles actifs</td><td>ITO = référence culture IA Groupe</td></tr>
+          <tr><td>P7 Groupe</td><td>Pas d'interface Groupe</td><td>Premiers contacts DSI Groupe</td><td>Alignement standards Groupe</td><td>Contribution active au Groupe</td><td>Co-construction stratégie Groupe</td></tr>
+          <tr><td>P8 Plateforme ★</td><td>Pas de plateforme ITO</td><td>Premières briques runtime</td><td>Plateforme opérationnelle ITO</td><td>Plateforme ouverte aux métiers</td><td>Plateforme Groupe de référence</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="sec-hd">Évaluation par pilier — questions d'auto-diagnostic</p>
+    <div class="gov-cards">
+      <div class="gov-card">
+        <div class="gov-card-title">♟️ Stratégie &amp; valeur</div>
+        <div class="gov-card-body">L'ITO dispose-t-elle d'une vision IA formalisée et d'un portefeuille de cas d'usage priorisés par ROI/risque, mis à jour trimestriellement ?</div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">🗄️ Données &amp; infrastructure</div>
+        <div class="gov-card-body">Les pipelines des agents en prod ont-ils &gt;99 % de disponibilité, un data lineage documenté et une architecture validée par le Groupe ?</div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">🛡️ Gouvernance &amp; risques</div>
+        <div class="gov-card-body">Tous les agents en production ont-ils un Passeport Agent et passent-ils un jeu d'evals avant déploiement ?</div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">🔒 Sécurité by Design</div>
+        <div class="gov-card-body">Le red teaming est-il intégré au pipeline CI/CD ? L'audit DORA des agents a-t-il été réalisé avec succès ?</div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">⚙️ Modèles opérationnels</div>
+        <div class="gov-card-body">Les rôles AI Engineer et AgentOps Engineer sont-ils officiels dans l'organigramme avec dashboard AgentOps en prod ?</div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">👥 Talent &amp; culture</div>
+        <div class="gov-card-body">Un programme de formation IA ITO existe-t-il avec &gt;70 % de complétion dans les équipes ciblées ?</div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">🏛️ Intégration Groupe</div>
+        <div class="gov-card-body">Un représentant Groupe siège-t-il au Comité IA ITO ? Le processus Gatekeeper est-il formalisé et exercé ?</div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">🧩 Plateforme P8 ★</div>
+        <div class="gov-card-body">La plateforme supporte-t-elle &gt;3 agents ITO en prod avec IAM, logging, isolation et guardrails runtime intégrés ?</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================ GOUVERNANCE & HITL ============================ -->
+  <div class="panel" id="panel-governance">
+    <p class="sec-hd">Le modèle HITL gradué — 3 niveaux de supervision humaine</p>
+    <div class="hitl-levels">
+      <div class="hitl-card h1">
+        <span class="hitl-tag">HITL-1</span>
+        <div class="hitl-name">Supervision totale</div>
+        <div class="hitl-body">L'humain valide <strong>chaque action</strong>. Usage : décisions de crédit, conformité AML, libération de paiements en production, modification de règles firewall.</div>
+      </div>
+      <div class="hitl-card h2">
+        <span class="hitl-tag">HITL-2</span>
+        <div class="hitl-name">Supervision par exception</div>
+        <div class="hitl-body">L'agent agit, l'humain intervient <strong>sur alertes</strong>. Usage : réconciliation comptable, reporting prudentiel, triage SIEM, détection de fraude.</div>
+      </div>
+      <div class="hitl-card h3">
+        <span class="hitl-tag">HITL-3</span>
+        <div class="hitl-name">Supervision périodique</div>
+        <div class="hitl-body">Audit régulier. Usage : veille réglementaire, réponse à un ticket L1, optimisation de portefeuille à faible risque.</div>
+      </div>
+    </div>
+
+    <p class="sec-hd">Matrice HITL recalibrée pour l'ITO — action × environnement</p>
+    <div class="callout">
+      <p>Dans l'ITO, le calibrage HITL repose sur 2 axes : <strong>impact opérationnel × environnement de déploiement</strong>. Une même action peut être en HITL-3 en Dev/Recette et passer en HITL-1 en Production.</p>
+    </div>
+    <div class="hitl-matrix">
+      <table>
+        <thead>
+          <tr>
+            <th>Action de l'agent</th>
+            <th>Dev</th>
+            <th>Recette</th>
+            <th>Pré-prod</th>
+            <th>Production</th>
+            <th>Justification</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Répondre à un ticket L1</td><td><span class="hitl-cell h3">H3</span></td><td><span class="hitl-cell h3">H3</span></td><td><span class="hitl-cell h3">H3</span></td><td><span class="hitl-cell h3">H3</span></td><td>Faible impact, réversible</td></tr>
+          <tr><td>Libérer un paiement</td><td><span class="hitl-cell h3">H3</span></td><td><span class="hitl-cell h3">H3</span></td><td><span class="hitl-cell h2">H2</span></td><td><span class="hitl-cell h1">H1</span></td><td>Sortie de fonds irréversible</td></tr>
+          <tr><td>Modifier règle firewall</td><td><span class="hitl-cell h1">H1</span></td><td><span class="hitl-cell h1">H1</span></td><td><span class="hitl-cell h1">H1</span></td><td><span class="hitl-cell h1">H1</span></td><td>Impact sécurité critique</td></tr>
+          <tr><td>Déployer du code</td><td><span class="hitl-cell h2">H2</span></td><td><span class="hitl-cell h2">H2</span></td><td><span class="hitl-cell h1">H1</span></td><td><span class="hitl-cell h1">H1</span></td><td>Pipeline validation obligatoire</td></tr>
+          <tr><td>Triage alertes SIEM</td><td><span class="hitl-cell h2">H2</span></td><td><span class="hitl-cell h2">H2</span></td><td><span class="hitl-cell h2">H2</span></td><td><span class="hitl-cell h2">H2</span></td><td>Escalade humaine au-dessus seuil</td></tr>
+          <tr><td>Valider un crédit</td><td><span class="hitl-cell h1">H1</span></td><td><span class="hitl-cell h1">H1</span></td><td><span class="hitl-cell h1">H1</span></td><td><span class="hitl-cell h1">H1</span></td><td>Engagement de crédit ferme</td></tr>
+          <tr><td>Lever une réserve doc.</td><td><span class="hitl-cell h2">H2</span></td><td><span class="hitl-cell h2">H2</span></td><td><span class="hitl-cell h1">H1</span></td><td><span class="hitl-cell h1">H1</span></td><td>Exposition Trade Finance</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="sec-hd">Le Passeport Agent — dossier de validation</p>
+    <div class="gov-cards">
+      <div class="gov-card">
+        <div class="gov-card-title"><span class="gov-pill gp-orig">Contribution originale</span></div>
+        <div class="gov-card-title" style="margin-top:6px">📋 Structure du Passeport</div>
+        <div class="gov-card-body"><strong>Identité &amp; finalité</strong> · Périmètre décisionnel · Niveau HITL applicable · Données accessibles · Responsable métier · Approbations Conformité &amp; Risque · Historique des incidents · Date de prochaine revue.</div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">🏛️ Comité IA ITO</div>
+        <div class="gov-card-body">Instance mensuelle (DSI, DRO, Conformité, DPO, métiers, <strong>+ représentant Groupe</strong>). Valide chaque agent avant mise en production, revue des KRIs, gestion des incidents agents.</div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">⚠️ Taxonomie des risques agentiques</div>
+        <div class="gov-card-body">Délégation excessive · Hallucination dans des décisions financières · Biais algorithmiques · Propagation d'erreurs multi-agents · Dépendance fournisseur LLM · Injection de prompt · Excessive Agency (OWASP LLM06).</div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">📜 Exigences réglementaires</div>
+        <div class="gov-card-body"><strong>EU AI Act</strong> (systèmes haut risque), <strong>DORA</strong>, <strong>RGPD</strong> art. 22, <strong>BCBS 239</strong>, <strong>MiCA</strong>, recommandations <strong>ACPR/EBA</strong>, analogie <strong>SR 11-7</strong> pour la validation des modèles.</div>
+      </div>
+    </div>
+
+    <p class="sec-hd">Sécurité runtime — la défense en profondeur de l'agent</p>
+    <div class="callout">
+      <p>Aucun garde-fou unique ne suffit : la sécurité d'un agent en production <strong>s'empile en couches</strong>, du prompt jusqu'à l'exécution. Chaque couche reste faillible ; c'est leur empilement qui protège.</p>
+    </div>
+    <div class="sec-layers">
+      <div class="sec-layer"><div class="sec-layer-name">Modèle</div><div class="sec-layer-body">Modèle entraîné à la sécurité, prompt système avec rôle et interdictions explicites.</div></div>
+      <div class="sec-layer"><div class="sec-layer-name">Exécution</div><div class="sec-layer-body">Moindre privilège, conteneurisation, sandbox, AgentGateway hors du contrôle du LLM.</div></div>
+      <div class="sec-layer"><div class="sec-layer-name">Humaine</div><div class="sec-layer-body">Confirmation explicite pour toute action destructive, modes de revue manuelle.</div></div>
+      <div class="sec-layer"><div class="sec-layer-name">Monitoring</div><div class="sec-layer-body">Logs complets prompts + actions, alertes sur événements anormaux, OpenTelemetry.</div></div>
+      <div class="sec-layer"><div class="sec-layer-name">Entrée</div><div class="sec-layer-body">Anti-injection (LLM Guard, classifieurs), DLP, contenu externe traité comme hostile.</div></div>
+      <div class="sec-layer"><div class="sec-layer-name">Sortie</div><div class="sec-layer-body">Code généré = code externe, analyse statique, scan secrets/dépendances, /security-review.</div></div>
+      <div class="sec-layer"><div class="sec-layer-name">Tests</div><div class="sec-layer-body">Red teaming régulier, campagnes multi-tours (Giskard), dépôts factices piégés.</div></div>
+      <div class="sec-layer"><div class="sec-layer-name">Veille</div><div class="sec-layer-body">OWASP GenAI, blogs sécurité, mise à jour agents/modèles dès les patchs.</div></div>
+    </div>
+
+    <p class="sec-hd">Eval-driven development — l'évaluation comme discipline d'ingénierie</p>
+    <div class="gov-cards">
+      <div class="gov-card">
+        <div class="gov-card-title">🎯 Principe</div>
+        <div class="gov-card-body">Le non-déterminisme des LLM rend le testing classique insuffisant. Dès qu'une vraie régression ne se distingue plus du bruit, des jeux d'evals tirés de cas réels (incidents, transcripts d'échec) deviennent indispensables.</div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">📚 Deux suites complémentaires</div>
+        <div class="gov-card-body"><strong>Capability</strong> mesure les progrès (taux bas attendu au départ) ; <strong>régression</strong> protège les acquis (~100 %). On évalue le résultat final obtenu, pas une séquence d'actions imposée.</div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">⚖️ Graders gradués</div>
+        <div class="gov-card-body">Hiérarchie <strong>déterministe → LLM-juge → humain</strong> : graders programmatiques par défaut, LLM-juge pour les critères subjectifs (ton, pertinence), revue humaine pour calibrer.</div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">🔄 Intégration CI/CD</div>
+        <div class="gov-card-body">Les evals tournent comme des tests : rejeu à chaque changement de prompt, d'agent ou de modèle. <strong>Chaque incident de production devient un nouveau cas de test.</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================ PLATEFORME & ARCHITECTURE ============================ -->
+  <div class="panel" id="panel-platform">
+    <p class="sec-hd">Pilier 8 ★ — La Plateforme Agentique Interne</p>
+    <div class="callout">
+      <p><strong>Pilier nouveau spécifique à l'ITO</strong>, absent de la version générique de l'AAAF et des frameworks publiés à ce jour. La plateforme est le produit central de l'ITO dans l'ère agentique — son niveau de maturité détermine directement la vitesse d'adoption de l'IA dans l'ensemble de l'EO.</p>
+    </div>
+    <div class="p8-caps">
+      <div class="p8-cap">
+        <div class="p8-cap-title">⚙️ Runtime &amp; Orchestration</div>
+        <ul class="p8-cap-body">
+          <li>Moteur d'exécution des agents</li>
+          <li>Orchestration multi-agents</li>
+          <li>Gestion des sessions et du contexte</li>
+          <li>Intégration des outils via MCP (capacités déclarées)</li>
+          <li>APIs d'intégration pour les directions métier</li>
+        </ul>
+      </div>
+      <div class="p8-cap">
+        <div class="p8-cap-title">📦 Modèles &amp; Catalogue</div>
+        <ul class="p8-cap-body">
+          <li>Catalogue de LLMs approuvés (souveraineté des données)</li>
+          <li>Registre des agents déployés (Passeport Agent centralisé)</li>
+          <li>Modèles pré-approuvés par Conformité Groupe</li>
+          <li>Versioning et gestion des mises à jour</li>
+          <li>Routage local / cloud et stratégie de fallback</li>
+        </ul>
+      </div>
+      <div class="p8-cap">
+        <div class="p8-cap-title">📊 Observabilité &amp; Contrôle</div>
+        <ul class="p8-cap-body">
+          <li>Dashboard AgentOps temps réel</li>
+          <li>Monitoring des comportements et dérives</li>
+          <li>Alertes et escalade automatiques</li>
+          <li>Logs d'audit complets (DORA)</li>
+          <li>Suivi des coûts d'inférence et budgets de tokens</li>
+        </ul>
+      </div>
+      <div class="p8-cap">
+        <div class="p8-cap-title">🛡️ Sécurité &amp; Accès</div>
+        <ul class="p8-cap-body">
+          <li>IAM des agents (principe moindre privilège)</li>
+          <li>Isolation des environnements Dev/Rec/Prod</li>
+          <li>Red teaming automatisé pré-déploiement</li>
+          <li>Chiffrement et protection des données traitées</li>
+          <li>Guardrails runtime et passerelle d'agents</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="sec-hd">MCP — un standard d'intégration pour les agents</p>
+    <div class="gov-cards">
+      <div class="gov-card">
+        <div class="gov-card-title">🧠 Modèle</div>
+        <div class="gov-card-body">Le principe « <strong>MCP-first</strong> » : le modèle raisonne et propose, le système valide et décide, le serveur exécute sous contrôle. L'agent sélectionne une capacité déclarée, sans décrire l'action en texte libre.</div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">📚 Catalogue</div>
+        <div class="gov-card-body">L'entreprise maintient un <strong>catalogue restreint</strong> de serveurs MCP approuvés plutôt qu'un référentiel ouvert. Le Host connaît à l'avance les serveurs autorisés et leur périmètre.</div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">🔍 Évaluation</div>
+        <div class="gov-card-body">Capacités explicites et typées, distinction <strong>lecture / écriture</strong>, accès par scopes, validation côté serveur, journalisation. Un bon serveur se comprend sans lire son code source.</div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">🚪 Passerelle</div>
+        <div class="gov-card-body">Une <strong>passerelle d'agents inamovible</strong> fait respecter les limites hors du contrôle du modèle. Serveurs conteneurisés, périmètre réseau et volumes explicitement définis.</div>
+      </div>
+    </div>
+
+    <p class="sec-hd">5 axes de décision — architecture organisationnelle</p>
+    <div class="callout">
+      <p>Ces 5 axes doivent être tranchés <strong>avant</strong> de choisir l'architecture — et dans cet ordre.</p>
+    </div>
+    <div class="axes">
+      <div class="axe"><div class="axe-num">1</div><div class="axe-content"><div class="axe-title">Centralisation vs Subsidiarité</div><div class="axe-sub">Qui construit et opère les agents ?</div></div></div>
+      <div class="axe"><div class="axe-num">2</div><div class="axe-content"><div class="axe-title">Topologie des risques</div><div class="axe-sub">Qui est responsable si un agent échoue ?</div></div></div>
+      <div class="axe"><div class="axe-num">3</div><div class="axe-content"><div class="axe-title">Make or Buy de la plateforme</div><div class="axe-sub">Hyperscaler, open source ou Groupe ?</div></div></div>
+      <div class="axe"><div class="axe-num">4</div><div class="axe-content"><div class="axe-title">Modèle de financement</div><div class="axe-sub">Cost center, shared service ou Groupe ?</div></div></div>
+      <div class="axe"><div class="axe-num">5</div><div class="axe-content"><div class="axe-title">Vitesse d'horloge</div><div class="axe-sub">Quel rythme l'ITO peut-elle absorber ?</div></div></div>
+    </div>
+
+    <p class="sec-hd">Matrice de décision — 3 modèles d'architecture pour l'ITO</p>
+    <div class="arch-models">
+      <div class="arch-card arch-1">
+        <div class="arch-name">Modèle Centralisé</div>
+        <div class="arch-sub">ITO as Platform</div>
+        <div class="arch-when"><strong>Quand ?</strong> Maturité N1-N2 · Culture conservatrice · Groupe fort</div>
+        <div class="arch-lists">
+          <div>
+            <div class="arch-list-title adv">✓ Avantages</div>
+            <ul class="arch-list">
+              <li>Cohérence technique garantie</li>
+              <li>Sécurité maîtrisée par l'ITO</li>
+              <li>Économies d'échelle</li>
+            </ul>
+          </div>
+          <div>
+            <div class="arch-list-title lim">✗ Limites</div>
+            <ul class="arch-list">
+              <li>Goulot d'étranglement ITO</li>
+              <li>Time-to-market lent</li>
+              <li>Déconnexion des réalités métier</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="arch-card arch-2">
+        <div class="arch-name">Modèle Fédéré</div>
+        <div class="arch-sub">Platform + Guilds métier habilitées</div>
+        <div class="arch-when"><strong>Quand ?</strong> Maturité N2-N3 · Équipes IT solides · Groupe présent</div>
+        <div class="arch-lists">
+          <div>
+            <div class="arch-list-title adv">✓ Avantages</div>
+            <ul class="arch-list">
+              <li>Autonomie métier encadrée</li>
+              <li>Innovation rapide</li>
+              <li>Gouvernance ITO maintenue</li>
+            </ul>
+          </div>
+          <div>
+            <div class="arch-list-title lim">✗ Limites</div>
+            <ul class="arch-list">
+              <li>Complexité de coordination</li>
+              <li>Compétences à développer</li>
+              <li>Fragmentation partielle</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="arch-card arch-3">
+        <div class="arch-name">Modèle Séquentiel</div>
+        <div class="arch-sub">Commencer petit, apprendre vite</div>
+        <div class="arch-when"><strong>Quand ?</strong> Maturité N1 · Budget contraint · Contexte incertain</div>
+        <div class="arch-lists">
+          <div>
+            <div class="arch-list-title adv">✓ Avantages</div>
+            <ul class="arch-list">
+              <li>Risque minimal</li>
+              <li>Apprentissage progressif</li>
+              <li>Réversible à tout moment</li>
+            </ul>
+          </div>
+          <div>
+            <div class="arch-list-title lim">✗ Limites</div>
+            <ul class="arch-list">
+              <li>Lent à scaler</li>
+              <li>Manque de vision plateforme</li>
+              <li>Risque de rester bloqué</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="sec-hd">Le paradoxe ITO — Talent &amp; Culture</p>
+    <div class="callout">
+      <p>Les équipes ITO sont les <strong>plus aptes techniquement</strong> à utiliser les agents, et les <strong>premières à ressentir la substitution</strong>. C'est le paradoxe central : l'ingénieur NOC devient orchestrateur d'agents AIOps, le dev senior garant de la qualité du code généré, l'analyste SOC superviseur de l'agent SIEM. Les collaborateurs qui maîtrisent l'IA agentique deviennent les orchestrateurs de la plateforme — un rôle de <strong>valeur supérieure</strong>, pas de substitution.</p>
+    </div>
+  </div>
+
+  <!-- ============================ CAS D'USAGE & ROADMAP ============================ -->
+  <div class="panel" id="panel-usecases">
+    <p class="sec-hd">Cas d'usage ITO — deux volets, six familles</p>
+    <div class="uc-volets">
+      <div class="uc-volet">
+        <div class="uc-volet-title">Volet IT</div>
+        <div class="uc-family">
+          <div class="uc-family-name">🛡️ Run &amp; Sécurité</div>
+          <ul class="uc-family-items">
+            <li>AIOps : détection &amp; résolution d'incidents</li>
+            <li>SOC semi-automatisé (triage SIEM), UEBA</li>
+            <li>DevSecOps &amp; conformité DORA / ISO 27001</li>
+          </ul>
+        </div>
+        <div class="uc-family">
+          <div class="uc-family-name">💻 Développement &amp; Delivery</div>
+          <ul class="uc-family-items">
+            <li>Copilotes IDE : code, tests, code review</li>
+            <li>Pipeline CI/CD intelligent</li>
+            <li>Documentation technique &amp; analyse d'impact</li>
+          </ul>
+        </div>
+        <div class="uc-family">
+          <div class="uc-family-name">🎫 Service Management (ITIL)</div>
+          <ul class="uc-family-items">
+            <li>Agent Service Desk L1/L2</li>
+            <li>Routage &amp; priorisation d'incidents</li>
+            <li>Suivi SLAs fournisseurs, knowledge management</li>
+          </ul>
+        </div>
+      </div>
+      <div class="uc-volet">
+        <div class="uc-volet-title">Volet Banking Operations</div>
+        <div class="uc-family">
+          <div class="uc-family-name">💳 Credit</div>
+          <ul class="uc-family-items">
+            <li>Contrôle &amp; instruction des dossiers de crédit</li>
+            <li>Suivi des covenants et des échéances</li>
+            <li>Gestion des sûretés et garanties</li>
+          </ul>
+        </div>
+        <div class="uc-family">
+          <div class="uc-family-name">💰 Cash Management</div>
+          <ul class="uc-family-items">
+            <li>Traitement des paiements, exceptions STP</li>
+            <li>Rapprochements cash et nostro/vostro</li>
+            <li>Contrôle des instructions client</li>
+          </ul>
+        </div>
+        <div class="uc-family">
+          <div class="uc-family-name">🌍 Trade Finance</div>
+          <ul class="uc-family-items">
+            <li>Crédits documentaires : contrôle documentaire</li>
+            <li>Garanties &amp; SBLC, remises documentaires</li>
+            <li>Contrôle sanctions &amp; embargos sur documents</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="callout">
+      <p><strong>Gains rapides :</strong> copilotes IDE et Service Desk (volet IT). <strong>Valeur métier la plus élevée :</strong> contrôle documentaire Trade Finance et Credit (volet Banking Operations).</p>
+    </div>
+
+    <p class="sec-hd">Cas d'usage finance avec niveaux HITL et ROI indicatifs</p>
+    <div class="gov-cards">
+      <div class="gov-card">
+        <div class="gov-card-title">🔍 KYC / AML <span class="hitl-cell h1" style="font-size:10px;width:auto;padding:2px 6px;margin-left:auto">HITL-1</span></div>
+        <div class="gov-card-body">Agent d'analyse documentaire et scoring comportemental. Décision finale toujours humaine. <strong>ROI : −65 % coûts de traitement.</strong></div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">🧮 Réconciliation comptable <span class="hitl-cell h2" style="font-size:10px;width:auto;padding:2px 6px;margin-left:auto">HITL-2</span></div>
+        <div class="gov-card-body">Rapprochement automatique des opérations. Détection des écarts, rapports d'exception. <strong>ROI : −70 % temps de traitement.</strong></div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">📊 Reporting prudentiel <span class="hitl-cell h2" style="font-size:10px;width:auto;padding:2px 6px;margin-left:auto">HITL-2</span></div>
+        <div class="gov-card-body">Collecte, transformation et consolidation COREP/FINREP/LCR. Soumission automatisée supervisée. <strong>ROI : −30 à −50 % charge reporting.</strong></div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">📰 Veille réglementaire <span class="hitl-cell h3" style="font-size:10px;width:auto;padding:2px 6px;margin-left:auto">HITL-3</span></div>
+        <div class="gov-card-body">Surveillance ESMA, BCE, AMF. Génère synthèses d'impact et alertes pour la conformité. <strong>ROI : −40 % temps de veille.</strong></div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">📈 Optimisation portefeuille <span class="hitl-cell h3" style="font-size:10px;width:auto;padding:2px 6px;margin-left:auto">HITL-3</span></div>
+        <div class="gov-card-body">Recommandations de réallocation sur la base de contraintes réglementaires prédéfinies. <strong>ROI : +15 bps performance ajustée.</strong></div>
+      </div>
+      <div class="gov-card">
+        <div class="gov-card-title">🚨 Détection de fraude <span class="hitl-cell h2" style="font-size:10px;width:auto;padding:2px 6px;margin-left:auto">HITL-2</span></div>
+        <div class="gov-card-body">Scoring temps réel sur les transactions. Blocage automatique sous seuil, escalade au-dessus. <strong>ROI : −30 % faux positifs.</strong></div>
+      </div>
+    </div>
+    <p style="font-size:10.5px;color:var(--color-text-tertiary);font-style:italic;margin-bottom:1.25rem;line-height:1.5">ROI : ordres de grandeur indicatifs issus de benchmarks publics 2024-2025 (McKinsey, Deloitte, HBR, Mastercard, 4CRisk). Résultats variables selon le périmètre et la maturité ; ne constituent pas une garantie de résultat.</p>
+
+    <p class="sec-hd">Feuille de route ITO — 4 phases sur environ 2 à 5 ans</p>
+    <div class="roadmap">
+      <div class="rm-row">
+        <div class="rm-phase-label">
+          <span class="rm-phase-name">Phase 1</span>
+          <span class="rm-phase-time">Explorer · 3–9 mois</span>
+        </div>
+        <div class="rm-cards">
+          <div class="rm-card"><div class="rm-card-title">Auto-diagnostic AAAF-ITO</div><div class="rm-card-sub">8 piliers évalués N1–N5, identification du goulot</div></div>
+          <div class="rm-card"><div class="rm-card-title">Décision axe 1 (architecture)</div><div class="rm-card-sub">Centralisé / Fédéré / Séquentiel selon maturité</div></div>
+          <div class="rm-card"><div class="rm-card-title">Premiers cas d'usage</div><div class="rm-card-sub">Copilotes IDE, Service Desk L1, alignement Groupe</div></div>
+          <div class="rm-card"><div class="rm-card-title">Comité IA ITO</div><div class="rm-card-sub">Constitution, charte, représentant Groupe identifié</div></div>
+        </div>
+      </div>
+      <div class="rm-row">
+        <div class="rm-phase-label">
+          <span class="rm-phase-name">Phase 2</span>
+          <span class="rm-phase-time">Expérimenter · 6–12 mois</span>
+        </div>
+        <div class="rm-cards">
+          <div class="rm-card"><div class="rm-card-title">Copilotes IDE déployés</div><div class="rm-card-sub">+ pilote HITL-3 agent Service Desk L1</div></div>
+          <div class="rm-card"><div class="rm-card-title">Pilote HITL-2 AIOps</div><div class="rm-card-sub">Monitoring prédictif d'incidents</div></div>
+          <div class="rm-card"><div class="rm-card-title">Briques de la plateforme</div><div class="rm-card-sub">Runtime, catalogue LLMs, dashboard basique</div></div>
+          <div class="rm-card"><div class="rm-card-title">Passeport Agent émis</div><div class="rm-card-sub">Pour chaque pilote, approuvé par le Comité IA</div></div>
+          <div class="rm-card"><div class="rm-card-title">Formation AgentOps</div><div class="rm-card-sub">Équipes ITO + ambassadeurs IA identifiés</div></div>
+        </div>
+      </div>
+      <div class="rm-row">
+        <div class="rm-phase-label">
+          <span class="rm-phase-name">Phase 3</span>
+          <span class="rm-phase-time">Industrialiser · 9–18 mois</span>
+        </div>
+        <div class="rm-cards">
+          <div class="rm-card"><div class="rm-card-title">Plateforme P8 opérationnelle</div><div class="rm-card-sub">Runtime, sécurité, isolation Dev/Rec/Prod intégrés</div></div>
+          <div class="rm-card"><div class="rm-card-title">Premier agent métier hébergé</div><div class="rm-card-sub">Direction métier intégrée sur la plateforme</div></div>
+          <div class="rm-card"><div class="rm-card-title">SOC semi-automatisé HITL-2</div><div class="rm-card-sub">En production, audit DORA validé</div></div>
+          <div class="rm-card"><div class="rm-card-title">AgentOps mature</div><div class="rm-card-sub">Dashboard temps réel, SLAs, eval-driven CI/CD</div></div>
+          <div class="rm-card"><div class="rm-card-title">ROI documenté</div><div class="rm-card-sub">Partagé au Groupe, validation auditeur externe</div></div>
+        </div>
+      </div>
+      <div class="rm-row">
+        <div class="rm-phase-label">
+          <span class="rm-phase-name">Phase 4</span>
+          <span class="rm-phase-time">Transformer · 12–24 mois</span>
+        </div>
+        <div class="rm-cards">
+          <div class="rm-card"><div class="rm-card-title">ITO = fournisseur plateforme EO</div><div class="rm-card-sub">≥3 directions métier hébergées, APIs documentées</div></div>
+          <div class="rm-card"><div class="rm-card-title">Agents tous industrialisés</div><div class="rm-card-sub">Ops, Sécurité, ITIL, multi-agents cross-fonctionnel</div></div>
+          <div class="rm-card"><div class="rm-card-title">Contribution catalogue Groupe</div><div class="rm-card-sub">Agents partagés, patterns d'intégration validés</div></div>
+          <div class="rm-card"><div class="rm-card-title">Modèle de refacturation actif</div><div class="rm-card-sub">Shared service, directions clientes contribuent</div></div>
+          <div class="rm-card"><div class="rm-card-title">Centre d'excellence Groupe</div><div class="rm-card-sub">Plateforme répliquée par d'autres EO du Groupe</div></div>
+        </div>
+      </div>
+    </div>
+
+    <p style="font-size:11px;color:var(--color-text-tertiary);font-style:italic;line-height:1.5">Ces durées par phase sont indicatives et varient selon la maturité, la taille et le contexte réglementaire de l'organisation. Les éléments de contexte ITO (maturité actuelle, plateforme Groupe, choix technologiques) permettront de les affiner.</p>
+
+    <p class="sec-hd">Prochaines étapes recommandées</p>
+    <div class="gov-cards">
+      <div class="gov-card"><div class="gov-card-title">01 · Auto-diagnostic maturité</div><div class="gov-card-body">Évaluer les 8 piliers sur l'échelle N1–N5. Identifier les asymétries critiques et le goulot d'étranglement prioritaire.</div></div>
+      <div class="gov-card"><div class="gov-card-title">02 · Atelier de priorisation</div><div class="gov-card-body">Sélectionner 2–3 cas d'usage prioritaires avec les métiers, la Conformité et le Risque.</div></div>
+      <div class="gov-card"><div class="gov-card-title">03 · Constituer l'équipe IA</div><div class="gov-card-body">Nommer le Chief AI Officer ITO, constituer le Comité IA, définir les rôles AI Engineer / AgentOps Engineer / AI Risk Officer.</div></div>
+      <div class="gov-card"><div class="gov-card-title">04 · Aligner avec le Groupe</div><div class="gov-card-body">Présenter le plan au Groupe, obtenir le budget, l'accès aux plateformes mutualisées et au catalogue de LLMs approuvés.</div></div>
+      <div class="gov-card"><div class="gov-card-title">05 · Lancer le premier pilote</div><div class="gov-card-body">Déployer le premier agent avec HITL approprié, émettre le Passeport Agent, mesurer le ROI, lancer la suite d'evals.</div></div>
+    </div>
+  </div>
+
+  <!-- ============================ SOURCES ============================ -->
+  <div class="panel" id="panel-sources">
+    <p class="sec-hd">Transparence intellectuelle</p>
+    <div class="callout">
+      <p>L'AAAF-ITO s'appuie sur <strong>11 sources externes vérifiables</strong> (NIST, OWASP, Gartner, UE, Federal Reserve, Microsoft) et identifie explicitement <strong>5 contributions originales</strong> qui n'existent pas dans la littérature publique. Cette transparence permet une lecture critique et un usage défendable face aux régulateurs.</p>
+    </div>
+
+    <p class="sec-hd">Sources externes vérifiables (11)</p>
+    <div class="src-grid">
+      <div class="src-card"><span class="src-tag s-ext">S1 · Gartner</span><div class="src-title">Modèle de maturité IA agentique (5 niveaux)</div><div class="src-ref">Emerging Tech: Agentic AI Maturity Roadmap — D. Casey, E. Goodness et al., 8 août 2025</div></div>
+      <div class="src-card"><span class="src-tag s-ext">S2 · Gartner</span><div class="src-title">40 % des projets IA agentique échoueront d'ici 2027</div><div class="src-ref">Communiqué de presse Gartner, 25 juin 2025</div></div>
+      <div class="src-card"><span class="src-tag s-ext">S3 · NIST</span><div class="src-title">Human-in-the-Loop — concept général</div><div class="src-ref">NIST AI Risk Management Framework 1.0 (AI RMF 1.0) — janvier 2023</div></div>
+      <div class="src-card"><span class="src-tag s-ext">S4 · OWASP</span><div class="src-title">Injection de prompt — risque n°1 des agents IA</div><div class="src-ref">OWASP Top 10 for LLM Applications 2025 — LLM01:2025</div></div>
+      <div class="src-card"><span class="src-tag s-ext">S5 · OWASP</span><div class="src-title">Excessive Agency — risque spécifique agents IA</div><div class="src-ref">OWASP Top 10 for LLM Applications 2025 — LLM06:2025</div></div>
+      <div class="src-card"><span class="src-tag s-ext">S6 · NIST</span><div class="src-title">Principe du moindre privilège</div><div class="src-ref">NIST SP 800-53 Rev. 5 — Contrôle AC-6, septembre 2020</div></div>
+      <div class="src-card"><span class="src-tag s-ext">S7 · UE</span><div class="src-title">DORA — Digital Operational Resilience Act</div><div class="src-ref">Règlement (UE) 2022/2554 — applicable depuis janvier 2025</div></div>
+      <div class="src-card"><span class="src-tag s-ext">S8 · UE</span><div class="src-title">EU AI Act — systèmes IA à haut risque</div><div class="src-ref">Règlement (UE) 2024/1689 — en vigueur depuis le 1er août 2024</div></div>
+      <div class="src-card"><span class="src-tag s-ext">S9 · Microsoft / NIST</span><div class="src-title">Red teaming des systèmes IA / LLMs</div><div class="src-ref">Microsoft Research 2022 + NIST AI RMF Playbook, Measure 2.5</div></div>
+      <div class="src-card"><span class="src-tag s-ext">S10 · AgentOps</span><div class="src-title">AgentOps — monitoring &amp; opérations des agents en prod</div><div class="src-ref">AgentOps.ai + écosystème LangChain, AutoGen, CrewAI (depuis 2024)</div></div>
+      <div class="src-card"><span class="src-tag s-ext">S11 · Fed / OCC</span><div class="src-title">Modèle de validation des modèles de risque (analogie Passeport)</div><div class="src-ref">SR 11-7 : Guidance on Model Risk Management — 4 avril 2011</div></div>
+    </div>
+
+    <p class="sec-hd">Contributions originales AAAF-ITO (5)</p>
+    <div class="src-grid">
+      <div class="src-card"><span class="src-tag s-orig">C1 · Original</span><div class="src-title">Passeport Agent</div><div class="src-ref">Concept construit par analogie avec le dossier de validation des modèles de risque (SR 11-7, EBA Guidelines on Internal Models). Le terme « Passeport Agent » et sa structure (identité, finalité, périmètre HITL, approbations, historique) sont des contributions originales. Aucune publication externe n'utilise ce terme à notre connaissance.</div></div>
+      <div class="src-card"><span class="src-tag s-orig">C2 · Original</span><div class="src-title">HITL gradué par environnement</div><div class="src-ref">Le concept HITL existe dans la littérature (NIST AI RMF, Anthropic). La déclinaison en <strong>matrice action × Dev/Rec/Pré-prod/Prod</strong> est une contribution originale de l'AAAF-ITO, adaptée à la réalité opérationnelle des directions ITO.</div></div>
+      <div class="src-card"><span class="src-tag s-orig">C3 · Original</span><div class="src-title">Double posture ITO (Consommatrice + Plateforme)</div><div class="src-ref">Analyse originale construite pour caractériser la position unique de la direction IT &amp; Opérations dans l'adoption de l'IA agentique. Ce cadre d'analyse n'est pas publié dans la littérature existante.</div></div>
+      <div class="src-card"><span class="src-tag s-orig">C4 · Original</span><div class="src-title">P8 — Plateforme Agentique Interne</div><div class="src-ref">8<sup>e</sup> pilier ajouté à l'AAAF-ITO pour couvrir la responsabilité spécifique de l'ITO. Absent de tous les frameworks publiés (Microsoft CAF, Gartner, AAGMM). Analogie : Platform Engineering, Inner Source, Shared Services IT.</div></div>
+      <div class="src-card"><span class="src-tag s-orig">C5 · Original</span><div class="src-title">AAAF-ITO — framework dans son ensemble</div><div class="src-ref">Framework original conçu par David Bon Salomon en mai 2026, sur la base de son expérience du pilotage de la transformation en environnement bancaire. Un assistant IA (Claude, Anthropic) a été utilisé comme outil de structuration et de rédaction.</div></div>
+    </div>
+
+    <p class="sec-hd">Ce que l'AAAF-ITO n'est pas — limites assumées</p>
+    <div class="gov-cards">
+      <div class="gov-card"><div class="gov-card-title">📐 Pas un standard normatif</div><div class="gov-card-body">Pas validé par un organisme de normalisation (ISO, NIST, ENISA). C'est un cadre de travail, pas une norme reconnue.</div></div>
+      <div class="gov-card"><div class="gov-card-title">🔬 Pas validé empiriquement</div><div class="gov-card-body">N'a pas été validé sur un panel d'organisations. Les statistiques (Gartner, OWASP) proviennent de leurs sources et ne sont pas garanties dans le temps.</div></div>
+      <div class="gov-card"><div class="gov-card-title">⚖️ Pas d'obligation réglementaire</div><div class="gov-card-body">Les niveaux HITL et cas d'usage sont des recommandations, pas des obligations réglementaires. Les contributions originales n'ont pas de validation externe publiée à ce jour.</div></div>
+      <div class="gov-card"><div class="gov-card-title">🌱 Un point de départ</div><div class="gov-card-body">À adapter au contexte spécifique de chaque EO. Framework vivant — enrichi à mesure que des éléments de contexte ITO spécifiques sont disponibles.</div></div>
+    </div>
+
+    <p class="sec-hd">Comment citer l'AAAF-ITO</p>
+    <div class="callout">
+      <p><strong>AAAF-ITO — Agentic AI Adoption Framework pour la Direction IT &amp; Opérations.</strong> Framework original conçu par David Bon Salomon, mai 2026 (assistant IA utilisé pour la rédaction). Version 1.2.</p>
+    </div>
+  </div>
+
+  <p class="fw-foot">
+    AAAF-ITO v1.2 · Mai 2026 · David Bon Salomon · Confidentiel — usage interne au Groupe.<br>
+    Ce widget consolide le framework publié (PDF FR/EN) et les enrichissements postérieurs au widget v1.0.
+  </p>
+</div>
+
+<script>
+const pillars = [
+  {
+    id: 1, icon: "♟️", short: "Stratégie & Valeur ITO", hint: "Vision, portfolio, ROI",
+    name: "P1 — Stratégie & Valeur ITO",
+    meta: "Orientation — définit le pourquoi et le quoi",
+    desc: "Définir et piloter la double ambition stratégique de l'ITO : adopter l'IA agentique pour ses propres processus ET construire la plateforme sur laquelle les autres directions de l'EO déploieront leurs agents. Ce pilier garantit l'alignement avec la stratégie du Groupe et la priorisation rigoureuse des investissements par valeur créée et niveau de risque.",
+    items: [
+      { label: "Activités clés", text: "Cartographie des cas d'usage ITO (Run, Sécurité, Build, ITIL) · Business case par agent · Matrice valeur/complexité/risque mise à jour trimestriellement · Qualification du besoin avant d'engager un agent (workflow déterministe privilégié quand il suffit) · Coût d'inférence intégré au business case." },
+      { label: "Livrables", text: "Portefeuille priorisé de cas d'usage ITO (backlog agentique) · Business case de la plateforme agentique interne · Tableau de bord stratégique IA ITO (suivi trimestriel)." },
+      { label: "KPIs stratégiques", text: "Taux d'adoption des agents · ROI cumulé · Satisfaction des directions clientes de la plateforme · Délai de traitement des cas d'usage." },
+      { label: "Spécificité finance", text: "Intégrer dès le départ les contraintes réglementaires (EU AI Act, DORA) dans le scoring des cas d'usage." }
+    ]
+  },
+  {
+    id: 2, icon: "🗄️", short: "Données & Infrastructure", hint: "Pipelines, souveraineté, intégration",
+    name: "P2 — Données & Infrastructure",
+    meta: "Fondation — garantit le substrat technique",
+    desc: "Garantir que l'ITO dispose des fondations techniques nécessaires à l'exécution fiable, performante et sécurisée des agents IA : qualité des données, pipelines temps réel, architecture cloud/on-prem conforme aux exigences de souveraineté du secteur financier, et intégration avec les systèmes existants (ITSM, SIEM, CMDB, monitoring).",
+    items: [
+      { label: "Activités clés", text: "Audit data quality & disponibilité (logs, alertes, tickets, métriques) · Pipelines temps réel pour AIOps/SOC · Architecture cloud souverain / on-prem / hybride · Intégration ServiceNow, Splunk, Datadog, CMDB, IAM · Data lineage par agent · Routage local / cloud (inférence souveraine pour les données Banking Operations sensibles)." },
+      { label: "Livrables", text: "Cartographie des flux de données par agent · Architecture de référence infrastructure agentique ITO · Rapport de data quality par domaine ITO." },
+      { label: "KPIs techniques", text: "Disponibilité pipelines >99 % · Latence inférieure à 1 s pour les agents temps réel · Complétude / fraîcheur / cohérence des données suivies en continu." },
+      { label: "Prérequis", text: "Sans fondations data, aucun agent ne peut fonctionner de manière fiable — c'est le prérequis non négociable du framework." }
+    ]
+  },
+  {
+    id: 3, icon: "🛡️", short: "Gouvernance & Risques", hint: "Passeport, Comité IA, HITL",
+    name: "P3 — Gouvernance & Risques",
+    meta: "Contrôle — encadre le cycle de vie des agents",
+    desc: "Encadrer le cycle de vie complet de chaque agent déployé par l'ITO ou hébergé sur sa plateforme : de la conception à la mise en production, jusqu'au retrait. Ce pilier institue les instances de décision, les processus d'approbation, le modèle HITL gradué par environnement, et les mécanismes de gestion des incidents et des dérives comportementales.",
+    items: [
+      { label: "Activités clés", text: "Émission &amp; maintien du Passeport Agent (identité, finalité, périmètre, HITL, approbations) · Comité IA ITO mensuel · Calibrage HITL par environnement (Dev/Rec/Pré-prod/Prod) · Registre centralisé des agents · Gestion des incidents agents · Jeux d'evals comme gate de déploiement, au même titre que le Passeport." },
+      { label: "Livrables", text: "Passeport Agent — template et registre centralisé · Charte de gouvernance du Comité IA ITO · Matrice HITL ITO (action × environnement) — document vivant · Rapport trimestriel de gouvernance des agents." },
+      { label: "Instance clé", text: "Comité IA ITO mensuel — DSI, DRO, Conformité, DPO, métiers + représentant Groupe. Valide chaque agent avant prod, revue KRIs, gestion incidents." },
+      { label: "Spécificité", text: "Le Passeport Agent et le HITL gradué par environnement sont des contributions originales de l'AAAF-ITO." }
+    ]
+  },
+  {
+    id: 4, icon: "🔒", short: "Sécurité by Design ≠", hint: "IAM, red team, DORA, audit",
+    name: "P4 ≠ — Sécurité by Design",
+    meta: "Protection — recalibré ITO (vue Gardien)",
+    desc: "Garantir que chaque agent déployé sur la plateforme ITO respecte les exigences de sécurité les plus élevées, depuis sa conception jusqu'à son retrait. Dans l'ITO, la sécurité est pensée depuis la perspective du gardien des systèmes : les agents ITO ont accès aux infrastructures les plus sensibles et doivent être traités avec la même rigueur que les comptes humains à privilèges élevés.",
+    items: [
+      { label: "Activités clés", text: "Moindre privilège systématique · Revue trimestrielle IAM des agents (≡ comptes privilégiés humains) · Red teaming obligatoire avant chaque mise en prod · Agents critiques inclus au PCA/PRA (DORA) · Logging immuable · Réponse incidents sécurité agents · Veille (prompt injection, model poisoning, data exfiltration) · Guardrails runtime + validation systématique du code généré." },
+      { label: "Livrables", text: "Politique de sécurité des agents ITO · Rapport de red teaming par agent avant mise en production · Registre des incidents sécurité impliquant des agents · Matrice des actions interdites aux agents sans validation humaine." },
+      { label: "Vue Gardien", text: "Un agent ITO avec accès au SIEM et aux règles firewall est une cible de premier choix. Le red teaming est obligatoire avant toute mise en production." },
+      { label: "DORA", text: "Un agent en production dans une banque est potentiellement un système critique au sens DORA. Sa défaillance doit être testée et documentée dans le plan de continuité." }
+    ]
+  },
+  {
+    id: 5, icon: "⚙️", short: "Modèles Opérationnels", hint: "CoE, AgentOps, ITIL, SLAs",
+    name: "P5 — Modèles Opérationnels",
+    meta: "Exécution — organise le comment et le qui",
+    desc: "Définir et mettre en œuvre les nouveaux modèles opérationnels rendus nécessaires par le déploiement d'agents IA dans l'ITO : organisation des équipes, nouveaux rôles, processus AgentOps, intégration avec les pratiques ITIL existantes, et pilotage de la performance opérationnelle des agents en production.",
+    items: [
+      { label: "Activités clés", text: "Centre d'Excellence IA ITO (référentiel, support, capitalisation) · Nouveaux rôles : AI Engineer, Agent Designer, AgentOps Engineer, AI Risk Officer ITO · AgentOps (monitoring continu, détection dérives, mises à jour) · Intégration ITIL · Dashboard AgentOps · SLAs vis-à-vis des directions clientes · Décommissionnement des agents · Niveaux d'intervention IA en CI/CD (observation, génération supervisée, autofix encadré) · Instructions agent versionnées « as code »." },
+      { label: "Livrables", text: "Charte du Centre d'Excellence IA ITO · Fiches de rôles · Playbook AgentOps ITO · Dashboard AgentOps (spécifications et KPIs)." },
+      { label: "KPIs opérationnels", text: "Taux de complétion sans intervention · Précision des décisions · Coût par tâche · Latence · Incidents / 1 000 tâches · HITL effectifs vs théoriques." },
+      { label: "Rôles cibles", text: "AI Product Owner · AI Engineer · Agent Designer · AgentOps Engineer · AI Risk Officer ITO · AI Ethics Officer · Knowledge Manager (alimentation RAG)." }
+    ]
+  },
+  {
+    id: 6, icon: "👥", short: "Talent & Culture ITO", hint: "Le paradoxe ITO, formation, rôles",
+    name: "P6 — Talent & Culture ITO",
+    meta: "Transformation — accompagne les équipes",
+    desc: "Accompagner la transformation des équipes ITO face à l'IA agentique en adressant frontalement le paradoxe ITO : les collaborateurs les plus techniquement proches de l'IA sont aussi ceux qui en ressentent le plus directement l'impact sur leurs rôles. Ce pilier vise à recentrer la valeur humaine vers l'orchestration et la supervision plutôt que l'exécution.",
+    items: [
+      { label: "Activités clés", text: "Diagnostic compétences vs besoins (AI literacy, AgentOps, gouvernance IA) · Programme de formation ITO (prompt engineering, supervision agents, red teaming) · Communication transparente sur l'impact sur les rôles · Co-construction des nouveaux rôles valorisants · Indicateurs d'adoption · CoP IA ITO · Identification d'ambassadeurs IA." },
+      { label: "Livrables", text: "Cartographie compétences ITO (état actuel vs cible AAAF-ITO) · Plan de formation IA ITO sur 12–24 mois · Kit de communication interne · Tableau de bord d'adoption (suivi mensuel par équipe)." },
+      { label: "Paradoxe ITO", text: "L'ingénieur NOC devient orchestrateur d'agents AIOps · le dev senior garant de la qualité du code généré · l'analyste SOC superviseur de l'agent SIEM · l'ITO devient fournisseur de plateforme pour l'EO." },
+      { label: "Message clé", text: "Les collaborateurs qui maîtrisent l'IA agentique deviennent les orchestrateurs de la plateforme — un rôle de valeur supérieure, pas de substitution." }
+    ]
+  },
+  {
+    id: 7, icon: "🏛️", short: "Intégration Groupe", hint: "Gatekeeper, standards, catalogue",
+    name: "P7 — Intégration Groupe",
+    meta: "Alignement — gère la relation Groupe / EO",
+    desc: "Gérer la relation bidirectionnelle entre l'ITO de l'EO et la DSI Groupe sur tous les sujets liés à l'IA agentique : alignement sur les standards et architectures Groupe, contribution au catalogue d'agents mutualisés, et exercice du rôle de Gatekeeper IT pour les agents de toutes les directions de l'EO qui nécessitent un accès aux systèmes IT.",
+    items: [
+      { label: "Activités clés", text: "Participation aux instances IA du Groupe · Adoption / déclinaison locale des standards Groupe (politiques IA, LLMs approuvés, architectures, sécurité) · Exercice du rôle de Gatekeeper IT (validation obligatoire pour tout agent métier accédant aux systèmes IT) · Contribution au catalogue d'agents Groupe · Remontée des retours d'expérience · Négociation du budget IA Groupe · Coordination avec les ITO des autres EO." },
+      { label: "Livrables", text: "Convention de service ITO ↔ Groupe sur la plateforme agentique · Rapport trimestriel de contribution au Groupe · Processus de validation Gatekeeper IT (procédure et SLA)." },
+      { label: "L'EO reçoit du Groupe", text: "Politiques IA et standards de gouvernance · Architecture data et plateformes mutualisées · Budget IA alloué · Modèles pré-approuvés par la Conformité Groupe · Cadre de contrôle des risques IA." },
+      { label: "L'EO contribue au Groupe", text: "Agents et use cases industrialisés (réutilisables) · Retours d'expérience terrain · Données de performance et KPIs · Innovation (nouveaux cas d'usage) · Participation aux CoP IA Groupe." }
+    ]
+  },
+  {
+    id: 8, icon: "🧩", short: "Plateforme Agentique ★", hint: "Pilier nouveau spécifique ITO",
+    name: "P8 ★ — Plateforme Agentique Interne",
+    meta: "Infrastructure — opère la plateforme mutualisée EO",
+    desc: "Construire, opérer et faire évoluer la plateforme technique mutualisée qui permet à l'ITO et aux autres directions de l'EO de déployer, superviser et retirer des agents IA dans un cadre sécurisé, gouverné et auditable. La plateforme est le produit central de l'ITO dans l'ère agentique — son niveau de maturité détermine directement la vitesse d'adoption de l'IA dans l'ensemble de l'EO.",
+    items: [
+      { label: "Runtime & Orchestration", text: "Moteur d'exécution des agents · Orchestration multi-agents · Gestion des sessions et du contexte · Intégration MCP (capacités déclarées) · APIs d'intégration pour les directions métier." },
+      { label: "Modèles & Catalogue", text: "Catalogue de LLMs approuvés (souveraineté) · Registre des agents (Passeport Agent centralisé) · Modèles pré-approuvés par Conformité Groupe · Versioning · Routage local / cloud et stratégie de fallback." },
+      { label: "Observabilité & Contrôle", text: "Dashboard AgentOps temps réel · Monitoring comportements et dérives · Alertes et escalade automatiques · Logs d'audit complets (DORA) · Suivi des coûts d'inférence et budgets de tokens." },
+      { label: "Sécurité & Accès", text: "IAM des agents (moindre privilège) · Isolation Dev/Rec/Prod · Red teaming automatisé pré-déploiement · Chiffrement · Guardrails runtime et passerelle d'agents." }
+    ]
+  }
+];
+
+const levels = [
+  {
+    name: "N1 — Conscient",
+    desc: "L'ITO perçoit l'IA agentique comme un sujet émergent mais n'a pas encore formalisé de vision ni de priorités. Aucun agent en production, pas de gouvernance formelle, l'infrastructure n'a pas été pensée pour des agents IA.",
+    signals: [
+      "Conversations informelles sur l'IA, sans sponsor ni structure identifiée",
+      "Aucun cas d'usage formellement identifié ni priorisé",
+      "Pas de budget IA ITO dédié",
+      "Aucun Passeport Agent, pas de Comité IA, pas de registre",
+      "Données non cataloguées, contraintes de souveraineté non évaluées sous l'angle IA",
+      "Aucune politique de sécurité spécifique aux agents, red teaming jamais réalisé",
+      "Aucune formation IA dispensée, pas de communication officielle sur l'impact",
+      "Aucune réunion de coordination avec la DSI Groupe sur le sujet"
+    ],
+    frein: "Absence de sponsor et de vision — le sujet reste dans les conversations sans jamais devenir une décision."
+  },
+  {
+    name: "N2 — Expérimentateur",
+    desc: "L'ITO a identifié 1 à 2 cas d'usage concrets et a commencé à les étudier sérieusement. Premiers pilotes en sandbox, premier cadre de gouvernance émergent, premières briques de plateforme déployées pour les pilotes.",
+    signals: [
+      "1 à 2 cas d'usage ITO identifiés (Service Desk, AIOps) avec première estimation de ROI",
+      "Sponsor interne identifié, budget d'expérimentation obtenu",
+      "Premier inventaire des données disponibles pour les pilotes",
+      "Passeport Agent émis pour les pilotes, Comité IA ITO constitué (réunions mensuelles)",
+      "Comptes de service dédiés aux agents, premier red teaming effectué",
+      "3–5 ambassadeurs IA identifiés, première formation à l'encadrement",
+      "Premier dashboard de monitoring agents pilotes opérationnel",
+      "Premiers contacts avec la DSI Groupe, alignement sur les LLMs approuvés"
+    ],
+    frein: "Le passage à l'acte dépend de quelques personnes — la stratégie n'est pas institutionnalisée et les pilotes ne sont pas encore prêts pour la production."
+  },
+  {
+    name: "N3 — Opérationnel",
+    desc: "L'ITO dispose d'une vision IA formalisée et d'un portefeuille priorisé. 2–4 agents en production avec supervision HITL systématique, gouvernance formalisée, plateforme stable, AgentOps actif, conformité DORA validée.",
+    signals: [
+      "Document de vision IA ITO validé par la direction, objectifs mesurables 12–24 mois",
+      "Portefeuille de 5–10 cas d'usage priorisés, mis à jour trimestriellement",
+      "Tous les agents en prod ont un Passeport Agent + passent un jeu d'evals",
+      "Matrice HITL (action × environnement) documentée et appliquée sans exception",
+      "Politique de sécurité agents validée par le RSSI, red teaming + guardrails runtime intégrés au pipeline",
+      "Rôles AI Engineer et AgentOps Engineer officiels, dashboard AgentOps en prod",
+      "Programme de formation IA déployé, >70 % de complétion dans les équipes ciblées",
+      "Représentant Groupe au Comité IA ITO, processus Gatekeeper formalisé, plateforme supporte ≥3 agents ITO"
+    ],
+    frein: "La gouvernance et la plateforme fonctionnent pour les agents ITO — elles ne sont pas encore étendues aux agents des autres directions de l'EO."
+  },
+  {
+    name: "N4 — Industriel",
+    desc: "La plateforme agentique ITO est ouverte aux directions métier de l'EO et génère de la valeur mesurable. Agents mutualisés en production, AgentOps mature, conformité DORA auditée, contribution active au Groupe.",
+    signals: [
+      "≥2 directions métier utilisent la plateforme ITO pour leurs propres agents",
+      "Modèle de refacturation / shared service en place",
+      "Pipelines temps réel < 1 s pour les agents opérationnels, catalogue data complet",
+      "Registre couvre 100 % des agents de l'EO, gouvernance auditée par Conformité Groupe",
+      "Red teaming automatisé dans le CI/CD, audit DORA externe réussi",
+      "Centre d'Excellence IA actif, SLAs tenus, parcours carrière ITO incluent étapes IA",
+      "ROI cumulé documenté et présenté au Comex EO, budget Groupe en croissance",
+      "Plateforme P8 référencée dans l'architecture cible du Groupe"
+    ],
+    frein: "La croissance de la demande métier peut dépasser la capacité de delivery de l'ITO ; le volume d'agents peut dépasser la capacité du Comité IA."
+  },
+  {
+    name: "N5 — Transformateur",
+    desc: "L'ITO est reconnue comme acteur stratégique de la transformation IA du Groupe. Sa plateforme est une référence, sa vision informe la stratégie d'entreprise, et les modèles opérationnels de l'EO ont été structurellement transformés.",
+    signals: [
+      "La direction ITO co-construit la stratégie IA du Groupe aux côtés de la DSI Groupe",
+      "Plateforme agentique ITO adoptée ou répliquée par ≥3 autres EO du Groupe",
+      "Capacités avancées en prod : multi-agents, mémoire longue durée, RAG, auto-amélioration",
+      "Sécurité prédictive : détection d'anomalies comportementales temps réel, threat intel agents",
+      ">60 % des incidents opérationnels ITO détectés/résolus sans intervention humaine",
+      "Modèle de transformation culturelle ITO partagé comme référence au Groupe",
+      "ITO mandatée par le Groupe pour développer des standards agentiques inter-EO",
+      "Plateforme proposée comme service SaaS interne à d'autres EO du Groupe"
+    ],
+    frein: "Risque de dépendance excessive à l'ITO et de perte de compétences opérationnelles de base si les agents tombent en panne simultanément ; vigilance humaine reste le dernier rempart."
+  }
+];
+
+// Build pillars
+const pgrid = document.getElementById('pillars-grid');
+pillars.forEach((p, i) => {
+  const badge = p.id === 8 ? '<span class="pillar-star">★ Nouveau</span>'
+              : p.id === 4 ? '<span class="pillar-diff">≠ Recalibré</span>' : '';
+  pgrid.innerHTML += `
+    <div class="pillar" onclick="selectPillar(${i})" id="pl-${i}">
+      ${badge}
+      <div class="pillar-icon">${p.icon}</div>
+      <div class="pillar-name">${p.id}. ${p.short}</div>
+      <div class="pillar-hint">${p.hint}</div>
+    </div>`;
+});
+
+function showPanel(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+function selectPillar(i) {
+  document.querySelectorAll('.pillar').forEach(p => p.classList.remove('selected'));
+  document.getElementById('pl-' + i).classList.add('selected');
+  const p = pillars[i];
+  const d = document.getElementById('pillar-detail');
+  d.style.display = 'block';
+  d.innerHTML = `
+    <div class="pd-title">${p.name}</div>
+    <div class="pd-meta">${p.meta}</div>
+    <div class="pd-desc">${p.desc}</div>
+    <div class="pd-grid">
+      ${p.items.map(it => `<div class="pd-item"><div class="pd-item-label">${it.label}</div><div class="pd-item-text">${it.text}</div></div>`).join('')}
+    </div>`;
+}
+
+function selectLevel(i) {
+  document.querySelectorAll('.mlevel').forEach(m => m.classList.remove('sel'));
+  document.getElementById('ml-' + i).classList.add('sel');
+  const l = levels[i];
+  document.getElementById('maturity-detail').innerHTML = `
+    <div style="font-size:15px;font-weight:500;margin-bottom:8px">${l.name}</div>
+    <div class="mat-desc">${l.desc}</div>
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--color-text-tertiary);margin-bottom:8px;font-weight:500">Signaux observables</div>
+    <div class="mat-signals">
+      ${l.signals.map(s => `<div class="mat-sig">${s}</div>`).join('')}
+    </div>
+    <div class="mat-frein"><strong>Frein typique : </strong>${l.frein}</div>`;
+}
+</script>
+
+</body>
+</html>
